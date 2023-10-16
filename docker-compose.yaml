@@ -1,0 +1,22 @@
+version: '3.6'
+
+services:
+  api:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    image: pyllama:cuda118
+    tty: true
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    env_file: .env
+    volumes:
+      - /volumes/localai-models:/models:cached
+    command: [ "python3", "main.py" ]

@@ -1,21 +1,16 @@
+import os
 import uvicorn
 from llama_cpp.server.app import create_app, Settings
 
-model_path = "/models/llama-2-7b-chat.Q4_K_M.gguf"
 
-verbose = True
-host = '0.0.0.0'
-port = '8080'
+user_config = dict()
+for field, val in Settings().model_dump().items():
+    if (uf := field.upper()) in os.environ:
+        print(f"{uf} in env")
+        user_config[field] = os.getenv(uf)
 
 if __name__ == '__main__':
-    config = {
-        'model': model_path,
-        'n_gpu_layers': 35,
-        'n_threads': 4,
-        'verbose': verbose,
-        'host': host,
-        'port': port
-    }
-    settings = Settings(**config)
+    print(user_config)
+    settings = Settings(**user_config)
     app = create_app(settings=settings)
     uvicorn.run(app, host=settings.host, port=settings.port)
