@@ -1,0 +1,17 @@
+FROM python:3.12-bookworm
+
+RUN apt-get update && apt-get upgrade -y \
+    && apt-get install -y git build-essential \
+    python3 python3-pip  wget bash cmake 
+
+COPY . .
+
+
+RUN python3 -m pip install -U -r requirements.txt 
+RUN python3 -m pip install llama-cpp-python --force-reinstall --upgrade --no-cache-dir
+
+ENV MODEL=/models/mistral-7b-instruct-v0.1.Q4_0.gguf
+ENV HOST=0.0.0.0
+ENV PORT=8080
+EXPOSE ${PORT}
+CMD [ "python3", "main.py" ]
