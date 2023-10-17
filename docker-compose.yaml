@@ -9,7 +9,7 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
-    image: pyllama:cuda118
+    image: pyllama:cpu
     tty: true
     build:
       context: .
