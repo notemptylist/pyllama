@@ -30,7 +30,7 @@ spec:
   storageClassName: longhorn
   resources:
     requests:
-      storage: 64Gi
+      storage: 6Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -48,14 +48,24 @@ spec:
         app: pyllama
     spec:
       restartPolicy: Always
+      initContainers:
+      - name: pyllama-init
+        image: busybox:latest
+        command: ['sh', '-c', "cd data; test -f *.gguf || wget https://gpt4all.io/models/gguf/mistral-7b-instruct-v0.1.Q4_0.gguf"]
+        volumeMounts:
+        - name: volv
+          mountPath: /data
       containers:
       - name: pyllama-container
         image: regulatedd/pyllama:cpu
         volumeMounts:
         - name: volv
-          mountPath: /data
+          mountPath: /models
         ports:
         - containerPort: 8080
+        env:
+        - name: MODEL
+          value: "/models/mistral-7b-instruct-v0.1.Q4_0.gguf"
       volumes:
       - name: volv
         persistentVolumeClaim:
